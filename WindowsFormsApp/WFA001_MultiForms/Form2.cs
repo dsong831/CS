@@ -15,17 +15,17 @@ namespace WFA001_MultiForms
         public Form2()
         {
             InitializeComponent();
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            CenterToParent();
             label1.Text = "Hi, nice to meet you !";
         }
 
         private void label1_Click(object sender, EventArgs e)
         {
 
-        }
-
-        private void Form2_Load(object sender, EventArgs e)
-        {
-            CenterToParent();
         }
     }
 }

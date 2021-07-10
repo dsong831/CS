@@ -15,13 +15,12 @@ namespace WFA001_MultiForms
         public Form1()
         {
             InitializeComponent();
-            button1.Text = "Click";
-            label1.Text = " ";
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            button1.Text = "Click";
+            label1.Text = " ";
         }
 
         private void button1_Click(object sender, EventArgs e)
