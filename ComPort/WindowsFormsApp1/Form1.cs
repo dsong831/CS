@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;       // by dSong
+using System.Windows.Forms.DataVisualization.Charting;  // by dSong
 
 namespace WindowsFormsApp1
 {
@@ -16,6 +17,8 @@ namespace WindowsFormsApp1
         string dataOut;     // by dSong
         string sendWidth;   // by dSong
         string dataIn;      // by dSong
+        int tickCount;      // by dSong
+        int xData, yData;   // by dSong
 
         public Form1()
         {
@@ -41,6 +44,8 @@ namespace WindowsFormsApp1
 
             chBoxAlwaysUpdate.Checked = false;
             chBoxAddToOldData.Checked = true;
+
+            chart1.Series[0].ChartType = SeriesChartType.Line;
         }
 
         private void btnOpen_Click(object sender, EventArgs e)
@@ -58,6 +63,9 @@ namespace WindowsFormsApp1
                 btnOpen.Enabled = false;
                 btnClose.Enabled = true;
                 lblStatusCom.Text = "ON";
+
+                timer1.Interval = 500;
+                timer1.Start();
             }
             catch (Exception err)
             {
@@ -77,6 +85,8 @@ namespace WindowsFormsApp1
                 btnOpen.Enabled = true;
                 btnClose.Enabled = false;
                 lblStatusCom.Text = "OFF";
+
+                timer1.Stop();
             }
         }
 
@@ -248,6 +258,32 @@ namespace WindowsFormsApp1
             {
                 tBoxDataIn.Text = "";
             }
+        }
+
+        private void lblStatusCom_Click(object sender, EventArgs e)
+        {
+//            Form form2 = new Form2();
+//            this.AddOwnedForm(form2);
+//            form2.Show();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            xData = tickCount;  yData = 0;
+            if(dataIn != null)
+            {
+                yData = Convert.ToInt32(dataIn, 16);
+            }
+
+            chart1.Series[0].Points.AddXY(xData, yData);
+            if (chart1.Series[0].Points.Count > 100)
+            {
+                chart1.Series[0].Points.RemoveAt(0);
+            }
+            chart1.ChartAreas[0].AxisX.Minimum = chart1.Series[0].Points[0].XValue;
+            chart1.ChartAreas[0].AxisX.Maximum = tickCount;
+
+            tickCount++;
         }
     }
 }

@@ -30,6 +30,9 @@ namespace WindowsFormsApp1
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.chBoxRtsEnable = new System.Windows.Forms.CheckBox();
             this.chBoxDtrEnable = new System.Windows.Forms.CheckBox();
@@ -65,7 +68,6 @@ namespace WindowsFormsApp1
             this.chBoxUsingButton = new System.Windows.Forms.CheckBox();
             this.btnClearDataOut = new System.Windows.Forms.Button();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.tBoxDataIn = new System.Windows.Forms.TextBox();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.lblDataInLength = new System.Windows.Forms.Label();
@@ -74,6 +76,9 @@ namespace WindowsFormsApp1
             this.chBoxAddToOldData = new System.Windows.Forms.CheckBox();
             this.chBoxAlwaysUpdate = new System.Windows.Forms.CheckBox();
             this.btnClearDataIn = new System.Windows.Forms.Button();
+            this.tBoxDataIn = new System.Windows.Forms.TextBox();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox8.SuspendLayout();
@@ -86,6 +91,7 @@ namespace WindowsFormsApp1
             this.groupBox10.SuspendLayout();
             this.groupBox11.SuspendLayout();
             this.groupBox13.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -268,6 +274,7 @@ namespace WindowsFormsApp1
             this.lblStatusCom.Size = new System.Drawing.Size(54, 19);
             this.lblStatusCom.TabIndex = 0;
             this.lblStatusCom.Text = "OFF";
+            this.lblStatusCom.Click += new System.EventHandler(this.lblStatusCom_Click);
             // 
             // progressBar1
             // 
@@ -456,14 +463,6 @@ namespace WindowsFormsApp1
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Receiver Control";
             // 
-            // tBoxDataIn
-            // 
-            this.tBoxDataIn.Location = new System.Drawing.Point(6, 20);
-            this.tBoxDataIn.Multiline = true;
-            this.tBoxDataIn.Name = "tBoxDataIn";
-            this.tBoxDataIn.Size = new System.Drawing.Size(309, 159);
-            this.tBoxDataIn.TabIndex = 7;
-            // 
             // groupBox10
             // 
             this.groupBox10.Controls.Add(this.groupBox11);
@@ -545,11 +544,40 @@ namespace WindowsFormsApp1
             this.btnClearDataIn.UseVisualStyleBackColor = true;
             this.btnClearDataIn.Click += new System.EventHandler(this.btnClearDataIn_Click);
             // 
+            // tBoxDataIn
+            // 
+            this.tBoxDataIn.Location = new System.Drawing.Point(6, 20);
+            this.tBoxDataIn.Multiline = true;
+            this.tBoxDataIn.Name = "tBoxDataIn";
+            this.tBoxDataIn.Size = new System.Drawing.Size(309, 159);
+            this.tBoxDataIn.TabIndex = 7;
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // chart1
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
+            this.chart1.Location = new System.Drawing.Point(12, 378);
+            this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(926, 183);
+            this.chart1.TabIndex = 7;
+            this.chart1.Text = "chart1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(953, 382);
+            this.ClientSize = new System.Drawing.Size(953, 573);
+            this.Controls.Add(this.chart1);
             this.Controls.Add(this.groupBox9);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -578,6 +606,7 @@ namespace WindowsFormsApp1
             this.groupBox11.PerformLayout();
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -628,6 +657,8 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.CheckBox chBoxAlwaysUpdate;
         private System.Windows.Forms.Button btnClearDataIn;
         private System.Windows.Forms.TextBox tBoxDataIn;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
     }
 }
 
