@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
         string dataOut;     // by dSong
         string sendWidth;   // by dSong
         string dataIn;      // by dSong
+        int dataIn_dec;     // by dSong
         int tickCount;      // by dSong
         int xData, yData;   // by dSong
 
@@ -207,7 +208,10 @@ namespace WindowsFormsApp1
 
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            dataIn = serialPort1.ReadExisting();
+//            dataIn = serialPort1.ReadExisting();
+            dataIn_dec = serialPort1.ReadByte();
+            dataIn = Convert.ToString(dataIn_dec);
+
             this.Invoke(new EventHandler(ShowData));
         }
 
@@ -269,11 +273,7 @@ namespace WindowsFormsApp1
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            xData = tickCount;  yData = 0;
-            if(dataIn != null)
-            {
-                yData = Convert.ToInt32(dataIn, 16);
-            }
+            xData = tickCount;  yData = dataIn_dec;
 
             chart1.Series[0].Points.AddXY(xData, yData);
             if (chart1.Series[0].Points.Count > 100)
