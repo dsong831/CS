@@ -18,6 +18,8 @@ namespace WindowsFormsApp1
         string dataOut;     // by dSong
         string sendWidth;   // by dSong
         string dataIn;      // by dSong
+        int dataInLength;   // by dSong
+        int[] dataInDec;    // by dSong
         int tickCount;      // by dSong
         int xData, yData;   // by dSong
 
@@ -51,6 +53,157 @@ namespace WindowsFormsApp1
         }
         #endregion
 
+        #region RX Data Format
+        private string RxDataFormat(int[] dataInput)
+        {
+            string strOut = "";
+
+            if (toolStripComboBox4.Text == "Hex")
+            {
+                foreach(int element in dataInput)
+                {
+                    strOut += Convert.ToString(element, 16) + "\t";
+                }
+            }
+            else if (toolStripComboBox4.Text == "Decimal")
+            {
+                foreach (int element in dataInput)
+                {
+                    strOut += Convert.ToString(element) + "\t";
+                }
+            }
+            else if (toolStripComboBox4.Text == "Binary")
+            {
+                foreach (int element in dataInput)
+                {
+                    strOut += Convert.ToString(element, 2) + "\t";
+                }
+            }
+            else if (toolStripComboBox4.Text == "Char")
+            {
+                foreach (int element in dataInput)
+                {
+                    strOut += Convert.ToChar(element);
+                }
+            }
+
+            return strOut;
+        }
+        #endregion
+
+        #region TX Data Format
+        private void TxDataFormat()
+        {
+            if(toolStripComboBox_TxDataFormat.Text == "Char")
+            {
+                serialPort1.Write(tBoxDataOut.Text);
+
+                int dataOutLength = tBoxDataOut.TextLength;
+                lblDataOutLength.Text = string.Format("{0:00}", dataOutLength);
+            }
+            else
+            {
+                string dataOutBuffer;
+                int countComma = 0;
+                string[] dataPrePareToSend;
+                byte[] datatoSend;
+
+                try
+                {
+                    dataOutBuffer = tBoxDataOut.Text;
+
+                    foreach (char c in dataOutBuffer) { if (c == ',') { countComma++; } }
+
+                    dataPrePareToSend = new string[countComma];
+
+                    countComma = 0;
+                    foreach(char c in dataOutBuffer)
+                    {
+                        if(c!=',')
+                        {
+                            dataPrePareToSend[countComma] += c;
+                        }
+                        else
+                        {
+                            countComma++;
+
+                            if(countComma == dataPrePareToSend.GetLength(0)) { break; }
+                        }
+                    }
+
+                    datatoSend = new byte[dataPrePareToSend.Length];
+
+                    if (toolStripComboBox_TxDataFormat.Text == "Hex")
+                    {
+                        for(int a=0; a<dataPrePareToSend.Length; a++)
+                        {
+                            datatoSend[a] = Convert.ToByte(dataPrePareToSend[a], 16);
+                        }
+                    }
+                    else if (toolStripComboBox_TxDataFormat.Text == "Binary")
+                    {
+                        for (int a = 0; a < dataPrePareToSend.Length; a++)
+                        {
+                            datatoSend[a] = Convert.ToByte(dataPrePareToSend[a], 2);
+                        }
+                    }
+                    else if (toolStripComboBox_TxDataFormat.Text == "Decimal")
+                    {
+                        for (int a = 0; a < dataPrePareToSend.Length; a++)
+                        {
+                            datatoSend[a] = Convert.ToByte(dataPrePareToSend[a], 10);
+                        }
+                    }
+
+                    serialPort1.Write(datatoSend, 0, datatoSend.Length);
+                    lblDataOutLength.Text = string.Format("{0:00}", datatoSend.Length);
+                }
+                catch(Exception error)
+                {
+                    MessageBox.Show(error.Message);
+                }
+            }
+        }
+
+        private void TxSendData()
+        {
+            if (serialPort1.IsOpen)
+            {
+                //dataOut = tBoxDataOut.Text;
+                if (sendWidth == "None")
+                {
+                    //serialPort1.Write(dataOut);
+                    TxDataFormat();
+                }
+                else if (sendWidth == "Both")
+                {
+                    //serialPort1.Write(dataOut + "\r\n");
+                    TxDataFormat();
+                    serialPort1.Write("\r\n");
+                }
+                else if (sendWidth == "New Line")
+                {
+                    //serialPort1.Write(dataOut + "\n");
+                    TxDataFormat();
+                    serialPort1.Write("\n");
+                }
+                else if (sendWidth == "Carriage Return")
+                {
+                    //serialPort1.Write(dataOut + "\r");
+                    TxDataFormat();
+                    serialPort1.Write("\r");
+                }
+            }
+            if (clearToolStripMenuItem.Checked)
+            {
+                if (tBoxDataOut.Text != "")
+                {
+                    tBoxDataOut.Text = "";
+                }
+            }
+        }
+        #endregion
+
         #region GUI Method
         public Form1()
         {
@@ -59,9 +212,6 @@ namespace WindowsFormsApp1
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            string[] ports = SerialPort.GetPortNames();
-            cBoxComPort.Items.AddRange(ports);
-
             chBoxDtrEnable.Checked = false;
             serialPort1.DtrEnable = false;
             chBoxRtsEnable.Checked = false;
@@ -80,6 +230,11 @@ namespace WindowsFormsApp1
             pathFile += @"\_My Source File\SerialData.txt";
 
             saveToTextFileToolStripMenuItem.Checked = false;
+
+            toolStripComboBox4.Text = "Char";
+            toolStripComboBox_TxDataFormat.Text = "Char";
+
+            this.toolStripComboBox_TxDataFormat.ComboBox.SelectionChangeCommitted += new System.EventHandler(this.toolStripComboBox_TxDataFormat_SelectionChangeCommitted);
 
             chart1.Series[0].ChartType = SeriesChartType.Line;
         }
@@ -119,26 +274,7 @@ namespace WindowsFormsApp1
 
         private void btnSendData_Click(object sender, EventArgs e)
         {
-            if(serialPort1.IsOpen)
-            {
-                dataOut = tBoxDataOut.Text;
-                if(sendWidth == "None")
-                {
-                    serialPort1.Write(dataOut);
-                }
-                else if(sendWidth == "Both")
-                {
-                    serialPort1.Write(dataOut + "\r\n");
-                }
-                else if (sendWidth == "New Line")
-                {
-                    serialPort1.Write(dataOut + "\n");
-                }
-                else if (sendWidth == "Carriage Return")
-                {
-                    serialPort1.Write(dataOut + "\r");
-                }
-            }
+            TxSendData();
         }
 
         private void toolStripComboBox2_DropDownClosed(object sender, EventArgs e)
@@ -187,20 +323,6 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (tBoxDataOut.Text != "")
-            {
-                tBoxDataOut.Text = "";
-            }
-        }
-
-        private void tBoxDataOut_TextChanged(object sender, EventArgs e)
-        {
-            int dataOutLength = tBoxDataOut.TextLength;
-            lblDataOutLength.Text = string.Format("{0:00}", dataOutLength);
-        }
-
         private void tBoxDataOut_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -213,38 +335,39 @@ namespace WindowsFormsApp1
 
         private void doSomething()
         {
-            if (serialPort1.IsOpen)
-            {
-                dataOut = tBoxDataOut.Text;
-                if (sendWidth == "None")
-                {
-                    serialPort1.Write(dataOut);
-                }
-                else if (sendWidth == "Both")
-                {
-                    serialPort1.Write(dataOut + "\r\n");
-                }
-                else if (sendWidth == "New Line")
-                {
-                    serialPort1.Write(dataOut + "\n");
-                }
-                else if (sendWidth == "Carriage Return")
-                {
-                    serialPort1.Write(dataOut + "\r");
-                }
-            }
-
+            TxSendData();
         }
 
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            dataIn = serialPort1.ReadExisting();
+            //dataIn = serialPort1.ReadExisting();
+
+            List<int> dataBuffer = new List<int>();
+
+            while(serialPort1.BytesToRead > 0)
+            {
+                try
+                {
+                    dataBuffer.Add(serialPort1.ReadByte());
+                }
+                catch(Exception error)
+                {
+                    MessageBox.Show(error.Message);
+                }
+            }
+
+            dataInLength = dataBuffer.Count();
+            dataInDec = new int[dataInLength];
+            dataInDec = dataBuffer.ToArray();
+
             this.Invoke(new EventHandler(ShowData));
         }
         
         private void ShowData(object sender, EventArgs e)
         {
-            int dataInLength = dataIn.Length;
+            //int dataInLength = dataIn.Length;
+            dataIn = RxDataFormat(dataInDec);
+
             lblDataInLength.Text = string.Format("{0:00}", dataInLength);
 
             if(toolStripComboBox1.Text == "Always Update")
@@ -317,6 +440,54 @@ namespace WindowsFormsApp1
                 tBoxDataIn.SelectionStart = tBoxDataIn.Text.Length;
                 tBoxDataIn.ScrollToCaret();
             }
+        }
+
+        private void cBoxComPort_DropDown(object sender, EventArgs e)
+        {
+            string[] ports = SerialPort.GetPortNames();
+            cBoxComPort.Items.Clear();
+            cBoxComPort.Items.AddRange(ports);
+        }
+
+        private void tBoxDataOut_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            char c = e.KeyChar;
+
+            if (toolStripComboBox_TxDataFormat.Text == "Hex")
+            {
+                char uppercase = char.ToUpper(c);
+
+                if(!char.IsDigit(uppercase) && uppercase != 8 && uppercase != 46 && uppercase != ',' && !(uppercase>=65 && uppercase<=70))
+                {
+                    e.Handled = true;
+                }
+            }
+            else if (toolStripComboBox_TxDataFormat.Text == "Decimal")
+            {
+                if (c!=49 && c!=48 && c != 8 && c != 46 && c != ',')
+                {
+                    e.Handled = true;
+                }
+            }
+            else if (toolStripComboBox_TxDataFormat.Text == "Binary")
+            {
+                if (!char.IsDigit(c) && c != 8 && c != 46 && c != ',')
+                {
+                    e.Handled = true;
+                }
+            }
+            else if (toolStripComboBox_TxDataFormat.Text == "Char")
+            {
+
+            }
+        }
+
+        private void toolStripComboBox_TxDataFormat_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            tBoxDataOut.Clear();
+
+            string message = "using data format";
+            MessageBox.Show(message, "Warning", MessageBoxButtons.OK);
         }
 
         private void timer1_Tick(object sender, EventArgs e)

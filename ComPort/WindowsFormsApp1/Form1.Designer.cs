@@ -30,9 +30,9 @@ namespace WindowsFormsApp1
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -79,11 +79,15 @@ namespace WindowsFormsApp1
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.dataPositionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripComboBox3 = new System.Windows.Forms.ToolStripComboBox();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.dataFormatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripComboBox4 = new System.Windows.Forms.ToolStripComboBox();
             this.multiplePortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.iN1PORTSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.oPENToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.dataFormatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripComboBox_TxDataFormat = new System.Windows.Forms.ToolStripComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox7.SuspendLayout();
@@ -102,16 +106,16 @@ namespace WindowsFormsApp1
             // 
             // chart1
             // 
-            chartArea4.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea4);
-            legend4.Name = "Legend1";
-            this.chart1.Legends.Add(legend4);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(8, 288);
             this.chart1.Name = "chart1";
-            series4.ChartArea = "ChartArea1";
-            series4.Legend = "Legend1";
-            series4.Name = "Series1";
-            this.chart1.Series.Add(series4);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(586, 183);
             this.chart1.TabIndex = 7;
             this.chart1.Text = "chart1";
@@ -123,6 +127,7 @@ namespace WindowsFormsApp1
             this.cBoxComPort.Name = "cBoxComPort";
             this.cBoxComPort.Size = new System.Drawing.Size(121, 20);
             this.cBoxComPort.TabIndex = 0;
+            this.cBoxComPort.DropDown += new System.EventHandler(this.cBoxComPort_DropDown);
             // 
             // cBoxBaudRate
             // 
@@ -279,8 +284,8 @@ namespace WindowsFormsApp1
             this.tBoxDataOut.Name = "tBoxDataOut";
             this.tBoxDataOut.Size = new System.Drawing.Size(244, 23);
             this.tBoxDataOut.TabIndex = 4;
-            this.tBoxDataOut.TextChanged += new System.EventHandler(this.tBoxDataOut_TextChanged);
             this.tBoxDataOut.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tBoxDataOut_KeyDown);
+            this.tBoxDataOut.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tBoxDataOut_KeyPress);
             // 
             // btnSendData
             // 
@@ -456,24 +461,28 @@ namespace WindowsFormsApp1
             // 
             this.transmitterToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.clearToolStripMenuItem,
-            this.endLineToolStripMenuItem});
+            this.endLineToolStripMenuItem,
+            this.dataFormatToolStripMenuItem1});
             this.transmitterToolStripMenuItem.Name = "transmitterToolStripMenuItem";
             this.transmitterToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
             this.transmitterToolStripMenuItem.Text = "Transmitter";
             // 
             // clearToolStripMenuItem
             // 
+            this.clearToolStripMenuItem.Checked = true;
+            this.clearToolStripMenuItem.CheckOnClick = true;
+            this.clearToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
-            this.clearToolStripMenuItem.Text = "Clear";
-            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clearToolStripMenuItem.Text = "Clear After Send";
+            this.clearToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // endLineToolStripMenuItem
             // 
             this.endLineToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripComboBox2});
             this.endLineToolStripMenuItem.Name = "endLineToolStripMenuItem";
-            this.endLineToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.endLineToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.endLineToolStripMenuItem.Text = "End Line";
             // 
             // toolStripComboBox2
@@ -494,7 +503,8 @@ namespace WindowsFormsApp1
             this.receiverToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.clearToolStripMenuItem1,
             this.showDataToolStripMenuItem,
-            this.dataPositionToolStripMenuItem});
+            this.dataPositionToolStripMenuItem,
+            this.dataFormatToolStripMenuItem});
             this.receiverToolStripMenuItem.Name = "receiverToolStripMenuItem";
             this.receiverToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
             this.receiverToolStripMenuItem.Text = "Receiver";
@@ -542,6 +552,49 @@ namespace WindowsFormsApp1
             this.toolStripComboBox3.Name = "toolStripComboBox3";
             this.toolStripComboBox3.Size = new System.Drawing.Size(121, 23);
             // 
+            // dataFormatToolStripMenuItem
+            // 
+            this.dataFormatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripComboBox4});
+            this.dataFormatToolStripMenuItem.Name = "dataFormatToolStripMenuItem";
+            this.dataFormatToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.dataFormatToolStripMenuItem.Text = "Data Format";
+            // 
+            // toolStripComboBox4
+            // 
+            this.toolStripComboBox4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.toolStripComboBox4.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.toolStripComboBox4.Items.AddRange(new object[] {
+            "Hex",
+            "Decimal",
+            "Binary",
+            "Char"});
+            this.toolStripComboBox4.Name = "toolStripComboBox4";
+            this.toolStripComboBox4.Size = new System.Drawing.Size(121, 23);
+            // 
+            // multiplePortToolStripMenuItem
+            // 
+            this.multiplePortToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.iN1PORTSToolStripMenuItem});
+            this.multiplePortToolStripMenuItem.Name = "multiplePortToolStripMenuItem";
+            this.multiplePortToolStripMenuItem.Size = new System.Drawing.Size(89, 20);
+            this.multiplePortToolStripMenuItem.Text = "Multiple Port";
+            // 
+            // iN1PORTSToolStripMenuItem
+            // 
+            this.iN1PORTSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.oPENToolStripMenuItem1});
+            this.iN1PORTSToolStripMenuItem.Name = "iN1PORTSToolStripMenuItem";
+            this.iN1PORTSToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.iN1PORTSToolStripMenuItem.Text = "2 IN 1 PORTS";
+            // 
+            // oPENToolStripMenuItem1
+            // 
+            this.oPENToolStripMenuItem1.Name = "oPENToolStripMenuItem1";
+            this.oPENToolStripMenuItem1.Size = new System.Drawing.Size(105, 22);
+            this.oPENToolStripMenuItem1.Text = "OPEN";
+            this.oPENToolStripMenuItem1.Click += new System.EventHandler(this.oPENToolStripMenuItem1_Click);
+            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
@@ -561,28 +614,25 @@ namespace WindowsFormsApp1
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "MONITOR";
             // 
-            // multiplePortToolStripMenuItem
+            // dataFormatToolStripMenuItem1
             // 
-            this.multiplePortToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.iN1PORTSToolStripMenuItem});
-            this.multiplePortToolStripMenuItem.Name = "multiplePortToolStripMenuItem";
-            this.multiplePortToolStripMenuItem.Size = new System.Drawing.Size(89, 20);
-            this.multiplePortToolStripMenuItem.Text = "Multiple Port";
+            this.dataFormatToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripComboBox_TxDataFormat});
+            this.dataFormatToolStripMenuItem1.Name = "dataFormatToolStripMenuItem1";
+            this.dataFormatToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.dataFormatToolStripMenuItem1.Text = "Data Format";
             // 
-            // iN1PORTSToolStripMenuItem
+            // toolStripComboBox_TxDataFormat
             // 
-            this.iN1PORTSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.oPENToolStripMenuItem1});
-            this.iN1PORTSToolStripMenuItem.Name = "iN1PORTSToolStripMenuItem";
-            this.iN1PORTSToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.iN1PORTSToolStripMenuItem.Text = "2 IN 1 PORTS";
-            // 
-            // oPENToolStripMenuItem1
-            // 
-            this.oPENToolStripMenuItem1.Name = "oPENToolStripMenuItem1";
-            this.oPENToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.oPENToolStripMenuItem1.Text = "OPEN";
-            this.oPENToolStripMenuItem1.Click += new System.EventHandler(this.oPENToolStripMenuItem1_Click);
+            this.toolStripComboBox_TxDataFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.toolStripComboBox_TxDataFormat.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.toolStripComboBox_TxDataFormat.Items.AddRange(new object[] {
+            "Hex",
+            "Decimal",
+            "Binary",
+            "Char"});
+            this.toolStripComboBox_TxDataFormat.Name = "toolStripComboBox_TxDataFormat";
+            this.toolStripComboBox_TxDataFormat.Size = new System.Drawing.Size(121, 23);
             // 
             // Form1
             // 
@@ -668,6 +718,10 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.ToolStripMenuItem multiplePortToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem iN1PORTSToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem oPENToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem dataFormatToolStripMenuItem;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBox4;
+        private System.Windows.Forms.ToolStripMenuItem dataFormatToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBox_TxDataFormat;
     }
 }
 
