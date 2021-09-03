@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;       // by dSong
+using System.IO;             // by dSong
 using System.Windows.Forms.DataVisualization.Charting;  // by dSong
 
 namespace WindowsFormsApp1
@@ -20,6 +21,37 @@ namespace WindowsFormsApp1
         int tickCount;      // by dSong
         int xData, yData;   // by dSong
 
+        StreamWriter objStreamWriter;
+        string pathFile;
+        bool state_AppendText = true;
+
+        #region My Own Method
+        private void SaveDataToTxtFile()
+        {
+            if(saveToTextFileToolStripMenuItem.Checked)
+            {
+                try
+                {
+                    objStreamWriter = new StreamWriter(pathFile, state_AppendText);
+                    if (toolStripComboBox_writeLineOrwriteText.Text == "WriteLine")
+                    {
+                        objStreamWriter.WriteLine(dataIn);
+                    }
+                    else if (toolStripComboBox_writeLineOrwriteText.Text == "Write")
+                    {
+                        objStreamWriter.Write(dataIn + " ");
+                    }
+                    objStreamWriter.Close();
+                }
+                catch (Exception err)
+                {
+                    MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        #endregion
+
+        #region GUI Method
         public Form1()
         {
             InitializeComponent();
@@ -30,25 +62,29 @@ namespace WindowsFormsApp1
             string[] ports = SerialPort.GetPortNames();
             cBoxComPort.Items.AddRange(ports);
 
-            btnOpen.Enabled = true;
-            btnClose.Enabled = false;
-
             chBoxDtrEnable.Checked = false;
             serialPort1.DtrEnable = false;
             chBoxRtsEnable.Checked = false;
             serialPort1.RtsEnable = false;
-            btnSendData.Enabled = false;
-            chBoxWriteLine.Checked = false;
-            chBoxWrite.Checked = true;
-            sendWidth = "Write";
+            btnSendData.Enabled = true;
+            sendWidth = "Both";
+            toolStripComboBox3.Text = "BOTTOM";
 
-            chBoxAlwaysUpdate.Checked = false;
-            chBoxAddToOldData.Checked = true;
+            toolStripComboBox1.Text = "Add Old Data";
+            toolStripComboBox2.Text = "Both";
+
+            toolStripComboBox_appendOrOverwriteText.Text = "Append Text";
+            toolStripComboBox_writeLineOrwriteText.Text = "WriteLine";
+
+            pathFile = Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory()));
+            pathFile += @"\_My Source File\SerialData.txt";
+
+            saveToTextFileToolStripMenuItem.Checked = false;
 
             chart1.Series[0].ChartType = SeriesChartType.Line;
         }
 
-        private void btnOpen_Click(object sender, EventArgs e)
+        private void oPENToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
@@ -60,31 +96,22 @@ namespace WindowsFormsApp1
 
                 serialPort1.Open();
                 progressBar1.Value = 100;
-                btnOpen.Enabled = false;
-                btnClose.Enabled = true;
-                lblStatusCom.Text = "ON";
 
                 timer1.Interval = 500;
                 timer1.Start();
             }
             catch (Exception err)
             {
-                MessageBox.Show(err.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                btnOpen.Enabled = true;
-                btnClose.Enabled = false;
-                lblStatusCom.Text = "OFF";
+                MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        private void cLOSEToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(serialPort1.IsOpen)
+            if (serialPort1.IsOpen)
             {
                 serialPort1.Close();
                 progressBar1.Value = 0;
-                btnOpen.Enabled = true;
-                btnClose.Enabled = false;
-                lblStatusCom.Text = "OFF";
 
                 timer1.Stop();
             }
@@ -95,14 +122,42 @@ namespace WindowsFormsApp1
             if(serialPort1.IsOpen)
             {
                 dataOut = tBoxDataOut.Text;
-                if(sendWidth == "WriteLine")
-                {
-                    serialPort1.WriteLine(dataOut);
-                }
-                else if(sendWidth == "Write")
+                if(sendWidth == "None")
                 {
                     serialPort1.Write(dataOut);
                 }
+                else if(sendWidth == "Both")
+                {
+                    serialPort1.Write(dataOut + "\r\n");
+                }
+                else if (sendWidth == "New Line")
+                {
+                    serialPort1.Write(dataOut + "\n");
+                }
+                else if (sendWidth == "Carriage Return")
+                {
+                    serialPort1.Write(dataOut + "\r");
+                }
+            }
+        }
+
+        private void toolStripComboBox2_DropDownClosed(object sender, EventArgs e)
+        {
+            if (toolStripComboBox2.Text == "None")
+            {
+                sendWidth = "None";
+            }
+            else if (toolStripComboBox2.Text == "Both")
+            {
+                sendWidth = "Both";
+            }
+            else if (toolStripComboBox2.Text == "New Line")
+            {
+                sendWidth = "New Line";
+            }
+            else if (toolStripComboBox2.Text == "Carriage Return")
+            {
+                sendWidth = "Carriage Return";
             }
         }
 
@@ -132,9 +187,9 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void btnClearDataOut_Click(object sender, EventArgs e)
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(tBoxDataOut.Text != "")
+            if (tBoxDataOut.Text != "")
             {
                 tBoxDataOut.Text = "";
             }
@@ -144,65 +199,41 @@ namespace WindowsFormsApp1
         {
             int dataOutLength = tBoxDataOut.TextLength;
             lblDataOutLength.Text = string.Format("{0:00}", dataOutLength);
-
-            if(chBoxUsingEnter.Checked)
-            {
-                tBoxDataOut.Text = tBoxDataOut.Text.Replace(Environment.NewLine, "");
-            }
-        }
-
-        private void chBoxUsingButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chBoxUsingButton.Checked)
-            {
-                btnSendData.Enabled = true;
-            }
-            else
-            {
-                btnSendData.Enabled = false;
-            }
         }
 
         private void tBoxDataOut_KeyDown(object sender, KeyEventArgs e)
         {
-            if(chBoxUsingEnter.Checked)
+            if (e.KeyCode == Keys.Enter)
             {
-                if(e.KeyCode == Keys.Enter)
+                this.doSomething();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void doSomething()
+        {
+            if (serialPort1.IsOpen)
+            {
+                dataOut = tBoxDataOut.Text;
+                if (sendWidth == "None")
                 {
-                    if(serialPort1.IsOpen)
-                    {
-                        dataOut = tBoxDataOut.Text;
-                        if (sendWidth == "WriteLine")
-                        {
-                            serialPort1.WriteLine(dataOut);
-                        }
-                        else if (sendWidth == "Write")
-                        {
-                            serialPort1.Write(dataOut);
-                        }
-                    }
+                    serialPort1.Write(dataOut);
+                }
+                else if (sendWidth == "Both")
+                {
+                    serialPort1.Write(dataOut + "\r\n");
+                }
+                else if (sendWidth == "New Line")
+                {
+                    serialPort1.Write(dataOut + "\n");
+                }
+                else if (sendWidth == "Carriage Return")
+                {
+                    serialPort1.Write(dataOut + "\r");
                 }
             }
-        }
 
-        private void chBoxWriteLine_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chBoxWriteLine.Checked)
-            {
-                sendWidth = "WriteLine";
-                chBoxWrite.Checked = false;
-                chBoxWriteLine.Checked = true;
-            }
-        }
-
-        private void chBoxWrite_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chBoxWrite.Checked)
-            {
-                sendWidth = "Write";
-                chBoxWrite.Checked = true;
-                chBoxWriteLine.Checked = false;
-            }
         }
 
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -210,51 +241,34 @@ namespace WindowsFormsApp1
             dataIn = serialPort1.ReadExisting();
             this.Invoke(new EventHandler(ShowData));
         }
-
+        
         private void ShowData(object sender, EventArgs e)
         {
             int dataInLength = dataIn.Length;
             lblDataInLength.Text = string.Format("{0:00}", dataInLength);
 
-            if(chBoxAlwaysUpdate.Checked)
+            if(toolStripComboBox1.Text == "Always Update")
             {
                 tBoxDataIn.Text = dataIn;
             }
-            else if(chBoxAddToOldData.Checked)
+            else if(toolStripComboBox1.Text == "Add Old Data")
             {
-                tBoxDataIn.Text += dataIn;
+                if(toolStripComboBox3.Text == "TOP")
+                {
+                    tBoxDataIn.Text = tBoxDataIn.Text.Insert(0, dataIn);
+                }
+                else if (toolStripComboBox3.Text == "BOTTOM")
+                {
+                    tBoxDataIn.Text += dataIn;
+                }
             }
+
+            SaveDataToTxtFile();
         }
 
-        private void chBoxAlwaysUpdate_CheckedChanged(object sender, EventArgs e)
+        private void clearToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            if(chBoxAlwaysUpdate.Checked)
-            {
-                chBoxAlwaysUpdate.Checked = true;
-                chBoxAddToOldData.Checked = false;
-            }
-            else
-            {
-                chBoxAddToOldData.Checked = true;
-            }
-        }
-
-        private void chBoxAddToOldData_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chBoxAddToOldData.Checked)
-            {
-                chBoxAlwaysUpdate.Checked = false;
-                chBoxAddToOldData.Checked = true;
-            }
-            else
-            {
-                chBoxAlwaysUpdate.Checked = true;
-            }
-        }
-
-        private void btnClearDataIn_Click(object sender, EventArgs e)
-        {
-            if(tBoxDataIn.Text != "")
+            if (tBoxDataIn.Text != "")
             {
                 tBoxDataIn.Text = "";
             }
@@ -267,12 +281,57 @@ namespace WindowsFormsApp1
 //            form2.Show();
         }
 
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Create by dsong", "dsong", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void eXITToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void toolStripComboBox_appendOrOverwriteText_DropDownClosed(object sender, EventArgs e)
+        {
+            if(toolStripComboBox_appendOrOverwriteText.Text == "Append Text")
+            {
+                state_AppendText = true;
+            }
+            else
+            {
+                state_AppendText = false;
+            }
+        }
+
+        private void oPENToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Form2 objForm2 = new Form2(this);
+            objForm2.Show();
+            this.Hide();
+        }
+
+        private void tBoxDataIn_TextChanged(object sender, EventArgs e)
+        {
+            if (toolStripComboBox3.Text == "BOTTOM")
+            {
+                tBoxDataIn.SelectionStart = tBoxDataIn.Text.Length;
+                tBoxDataIn.ScrollToCaret();
+            }
+        }
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             xData = tickCount;  yData = 0;
             if(dataIn != null)
             {
-                yData = Convert.ToInt32(dataIn, 16);
+                try
+                {
+                    yData = Convert.ToInt32(dataIn, 16);
+                }
+                catch (Exception err)
+                {
+                    // MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
 
             chart1.Series[0].Points.AddXY(xData, yData);
@@ -285,5 +344,7 @@ namespace WindowsFormsApp1
 
             tickCount++;
         }
+
+        #endregion
     }
 }
